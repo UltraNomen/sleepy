@@ -13,6 +13,8 @@ struct MenuPanel: View {
         VStack(spacing: 0) {
             timerSection
             Hairline()
+            endActionSection
+            Hairline()
             presetsSection
             Hairline()
             sleepAtSection
@@ -48,7 +50,7 @@ struct MenuPanel: View {
 
             Group {
                 if let sleepDate = engine.sleepDate {
-                    Text("Mac sleeps at \(TimeFormat.clock(sleepDate))")
+                    Text(model.store.endAction.endsAt(TimeFormat.clock(sleepDate)))
                 } else {
                     Text("Pick a time below")
                 }
@@ -76,9 +78,23 @@ struct MenuPanel: View {
         .padding(14)
     }
 
+    private var endActionSection: some View {
+        VStack(alignment: .leading, spacing: 9) {
+            Text("When time's up").label()
+            EndActionSwitch(model: model)
+            if model.shutdownBlocked {
+                Text("Sleepy can't shut down. Allow System Events in System Settings → Privacy & Security → Automation. It will sleep instead.")
+                    .font(.system(size: 10.5))
+                    .foregroundStyle(.orange)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(14)
+    }
+
     private var presetsSection: some View {
         VStack(alignment: .leading, spacing: 9) {
-            Text("Sleep in").label()
+            Text(model.store.endAction.inLabel).label()
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 3), spacing: 6) {
                 ForEach(Self.presets, id: \.self) { m in
                     PresetPill(minutes: m, selected: engine.selectedPreset == m) { engine.start(minutes: m) }
@@ -92,7 +108,7 @@ struct MenuPanel: View {
     private var sleepAtSection: some View {
         HStack(spacing: 6) {
             VStack(alignment: .leading, spacing: 3) {
-                Text("Sleep at").label()
+                Text(model.store.endAction.atLabel).label()
                 Text(TimeFormat.until(model.sleepAtDate, from: engine.now)).label(Theme.tertiary)
             }
             .fixedSize()
@@ -206,6 +222,45 @@ private struct PresetPill: View {
         .buttonStyle(.plain)
         .onHover { hover = $0 }
         .accessibilityLabel("\(minutes) minutes")
+    }
+}
+
+/// Picks what happens at zero. `compact` shows icons only, for the desktop widget.
+struct EndActionSwitch: View {
+    let model: AppModel
+    var compact = false
+
+    var body: some View {
+        HStack(spacing: compact ? 3 : 5) {
+            ForEach(EndAction.allCases) { action in
+                let selected = model.store.endAction == action
+                Button { model.setEndAction(action) } label: {
+                    Group {
+                        if compact {
+                            Image(systemName: action.symbol)
+                                .font(.system(size: 9, weight: .semibold))
+                                .frame(width: 20, height: 20)
+                        } else {
+                            HStack(spacing: 4) {
+                                Image(systemName: action.symbol).font(.system(size: 10, weight: .semibold))
+                                Text(action.title).font(.system(size: 11, weight: .medium)).lineLimit(1)
+                            }
+                            .frame(maxWidth: .infinity, minHeight: 28)
+                        }
+                    }
+                    .foregroundStyle(selected ? Color.black : Color.white.opacity(0.8))
+                    .background {
+                        Capsule().fill(selected ? Color.white : Color.white.opacity(0.05))
+                        if !selected { Capsule().strokeBorder(Theme.hairline, lineWidth: 0.5) }
+                    }
+                    .contentShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .help(action.title)
+                .accessibilityLabel(action.title)
+                .accessibilityAddTraits(selected ? .isSelected : [])
+            }
+        }
     }
 }
 

@@ -12,12 +12,14 @@ final class Store {
     var showRemaining: Bool { didSet { defaults.set(showRemaining, forKey: Keys.showRemaining) } }
     var headsUp: Bool { didSet { defaults.set(headsUp, forKey: Keys.headsUp) } }
     var desktopWidget: Bool { didSet { defaults.set(desktopWidget, forKey: Keys.desktopWidget) } }
+    var endAction: EndAction { didSet { defaults.set(endAction.rawValue, forKey: Keys.endAction) } }
 
     private enum Keys {
         static let schedules = "schedules"
         static let showRemaining = "showRemaining"
         static let headsUp = "headsUp"
         static let desktopWidget = "desktopWidget"
+        static let endAction = "endAction"
     }
 
     init(defaults: UserDefaults = .standard) {
@@ -26,6 +28,7 @@ final class Store {
         showRemaining = defaults.bool(forKey: Keys.showRemaining)
         headsUp = defaults.bool(forKey: Keys.headsUp)
         desktopWidget = defaults.bool(forKey: Keys.desktopWidget)
+        endAction = defaults.string(forKey: Keys.endAction).flatMap(EndAction.init(rawValue:)) ?? .sleep
         if let data = defaults.data(forKey: Keys.schedules),
            let saved = try? JSONDecoder().decode([Schedule].self, from: data) {
             schedules = saved

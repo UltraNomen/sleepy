@@ -24,7 +24,7 @@ struct StartSleepPresetIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
         AppModel.shared.engine.start(minutes: length.rawValue)
-        return .result(dialog: "Your Mac will sleep in \(length.rawValue) minutes.")
+        return .result(dialog: "\(AppModel.shared.store.endAction.spokenIn(minutes: length.rawValue))")
     }
 }
 
@@ -37,7 +37,7 @@ struct StartSleepTimerIntent: AppIntent {
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
         AppModel.shared.engine.start(minutes: minutes)
-        return .result(dialog: "Your Mac will sleep in \(minutes) minutes.")
+        return .result(dialog: "\(AppModel.shared.store.endAction.spokenIn(minutes: minutes))")
     }
 }
 
@@ -52,7 +52,7 @@ struct SleepAtIntent: AppIntent {
         let c = Calendar.current.dateComponents([.hour, .minute], from: time)
         AppModel.shared.run(.at(hour: c.hour ?? 0, minute: c.minute ?? 0))
         let at = TimeFormat.clock(AppModel.shared.sleepAtDate)
-        return .result(dialog: "Your Mac will sleep at \(at).")
+        return .result(dialog: "\(AppModel.shared.store.endAction.spokenAt(at))")
     }
 }
 
@@ -64,7 +64,7 @@ struct TimerStatusIntent: AppIntent {
         let engine = AppModel.shared.engine
         guard engine.isRunning else { return .result(value: 0, dialog: "No sleep timer is running.") }
         let minutes = Int((Double(engine.remainingSeconds) / 60).rounded(.up))
-        return .result(value: minutes, dialog: "\(minutes) minutes left before your Mac sleeps.")
+        return .result(value: minutes, dialog: "\(minutes) minutes left on the timer.")
     }
 }
 

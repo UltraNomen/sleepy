@@ -98,6 +98,22 @@ private func date(_ d: Int, _ h: Int, _ m: Int, month: Int = 11) -> Date {
     }
 }
 
+@Suite struct EndActionTests {
+    @Test func wording() {
+        #expect(EndAction.sleep.endsAt("05:05") == "Mac sleeps at 05:05")
+        #expect(EndAction.shutdown.endsAt("05:05") == "Mac shuts down at 05:05")
+        #expect(EndAction.stopMedia.endsAt("05:05") == "Media stops at 05:05")
+        #expect(EndAction.shutdown.spokenIn(minutes: 45) == "Your Mac will shut down in 45 minutes.")
+        #expect(EndAction.sleep.spokenAt("23:30") == "Your Mac will sleep at 23:30.")
+        #expect(EndAction.stopMedia.spokenAt("23:30") == "Your media will stop at 23:30.")
+    }
+
+    @Test func savedValuesStayStable() {
+        // These strings are stored in preferences, so renaming one would lose the choice.
+        #expect(EndAction.allCases.map(\.rawValue) == ["sleep", "shutdown", "stopMedia"])
+    }
+}
+
 @Suite struct MoonDotsTests {
     @Test func crescentOpensUpperRight() {
         for grid in [9, 11, 19] {

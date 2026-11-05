@@ -91,10 +91,6 @@ struct MakeIcon {
             ctx.fillEllipse(in: cellRect(cell.col, cell.row))
         }
 
-        // One blue star in the crescent's opening
-        ctx.setFillColor(rgb(0x3A, 0x4B, 0xF0))
-        ctx.fillEllipse(in: cellRect(grid * 6 / 10, grid * 4 / 10))
-
         return ctx.makeImage()!
     }
 

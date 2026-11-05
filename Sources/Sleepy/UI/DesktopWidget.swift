@@ -77,6 +77,7 @@ struct DesktopWidgetView: View {
             HStack {
                 Text("Sleepy").label()
                 Spacer()
+                EndActionSwitch(model: model, compact: true)
                 HStack(spacing: 6) {
                     Rectangle().fill(engine.isRunning ? Theme.accent : Theme.tertiary).frame(width: 5, height: 5)
                     Text(engine.isRunning ? "Running" : "Idle")
@@ -94,9 +95,9 @@ struct DesktopWidgetView: View {
 
             Group {
                 if let sleepDate = engine.sleepDate {
-                    Text("Mac sleeps at \(TimeFormat.clock(sleepDate))")
+                    Text(model.store.endAction.endsAt(TimeFormat.clock(sleepDate)))
                 } else {
-                    Text("Sleep in")
+                    Text(model.store.endAction.inLabel)
                 }
             }
             .label()

@@ -29,7 +29,7 @@
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSAppleEventsUsageDescription</key>
-	<string>Sleepy pauses Music, TV, Spotify, Podcasts and QuickTime before your Mac goes to sleep.</string>
+	<string>Sleepy pauses your media players when the timer ends, and uses System Events to shut down your Mac if you choose that.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

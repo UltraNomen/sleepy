@@ -55,8 +55,9 @@ struct HeadsUpView: View {
             }
             let time = Text(TimeFormat.countdown(seconds: model.engine.remainingSeconds))
                 .font(.system(size: 15, weight: .light, design: .monospaced))
-            let rest = Text("Save what matters.").foregroundStyle(Theme.secondary)
-            Text("Your Mac will sleep in \(time). \(rest)")
+            let action = model.store.endAction
+            let rest = Text(action.headsUpHint).foregroundStyle(Theme.secondary)
+            Text("\(action.headsUpLead) \(time). \(rest)")
                 .font(.system(size: 15))
                 .fixedSize(horizontal: false, vertical: true)
             HStack(spacing: 8) {

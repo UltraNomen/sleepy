@@ -16,6 +16,8 @@ final class AppModel {
     var settingsPage: SettingsPage = .general
     /// Time picked in the SLEEP AT row, minutes since midnight.
     var sleepAtMinutes = 23 * 60 + 30
+    /// Shut Down is selected but macOS refused the permission it needs.
+    var shutdownBlocked = false
 
     private let headsUp = HeadsUpController()
     private let widget = DesktopWidgetController()
@@ -27,8 +29,9 @@ final class AppModel {
             self.headsUp.show(model: self)
         }
         engine.onExpire = { [weak self] in
-            self?.headsUp.hide()
-            SleepController.sleepNow()
+            guard let self else { return }
+            self.headsUp.hide()
+            SleepController.perform(self.store.endAction)
         }
         engine.onTick = { [weak self] now in self?.checkSchedules(now: now) }
     }
@@ -61,6 +64,17 @@ final class AppModel {
     }
 
     func dismissHeadsUp() { headsUp.hide() }
+
+    /// Picking Shut Down asks for its permission now, rather than when the timer ends.
+    func setEndAction(_ action: EndAction) {
+        store.endAction = action
+        shutdownBlocked = false
+        guard action == .shutdown else { return }
+        Task {
+            let allowed = await SleepController.canShutDown()
+            if store.endAction == .shutdown { shutdownBlocked = !allowed }
+        }
+    }
 
     /// Shows or hides the desktop widget to match the setting.
     func applyDesktopWidget() {

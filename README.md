@@ -3,8 +3,8 @@
 # Sleepy
 
 A sleep timer that lives in the Mac menu bar. Pick a length or a time, and when it runs out
-Sleepy pauses what's playing and puts the Mac to sleep. Ten minutes before, a small card
-lets you extend or cancel.
+Sleepy pauses what's playing, then sleeps or shuts down the Mac, or just stops the media.
+Ten minutes before, a small card lets you extend or cancel.
 
 - One-tap lengths: 15, 30, 45, 60, 90, 120 minutes, or type your own (`75`, `1:30`, `1h 30m`)
 - Desktop widget: a live countdown with quick starts that sits on your desktop
@@ -64,11 +64,21 @@ It isn't in the macOS widget gallery. A gallery widget needs a signed app extens
 buttons need App Intents metadata, so that requires an Xcode build. Sleepy has to be running
 for its widget to show.
 
-## How it puts the Mac to sleep
+## What happens at zero
 
-Sleepy asks Music, TV, Spotify, Podcasts and QuickTime to pause, but only the ones that are
-running. The first time it does this, macOS asks you to allow automation. Then Sleepy runs
-`pmset sleepnow`. It needs no admin rights and no helper tools.
+Switch between three modes in the panel or on the desktop widget:
+
+- **Sleep** stops media, then puts the Mac to sleep with `pmset sleepnow`.
+- **Shut down** stops media, then asks macOS to shut down. Sleepy asks for permission to use
+  System Events when you pick this mode. If that's refused, it sleeps instead. An app with
+  unsaved work can still cancel a shutdown, the same as using the Apple menu.
+- **Stop media** stops media and leaves the Mac on.
+
+Stopping media covers Music, TV, Spotify, Podcasts, QuickTime and VLC, if they're running. It
+can't reach video playing in a web browser. The first time Sleepy stops each app, macOS asks
+you to allow it. No admin rights or helper tools are needed.
+
+Local builds are signed ad hoc, so macOS may ask for these permissions again after a rebuild.
 
 Schedules start only while Sleepy is running. Turn on **Open at login** so they keep working.
 
@@ -79,7 +89,7 @@ open build/Sleepy.app --args -demoSpeed 60 -dryRun YES
 ```
 
 - `-demoSpeed 60` runs the timer 60 times faster.
-- `-dryRun YES` beeps instead of sleeping.
+- `-dryRun YES` beeps instead of sleeping or shutting down.
 - `-preview YES` opens the menu panel and heads-up card in their own windows.
 
 ## Icon
